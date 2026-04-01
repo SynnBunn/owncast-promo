@@ -108,17 +108,12 @@
         const wsUrl = owncastUrl.replace(/^http/, 'ws') + '/api/chat/ws';
         const ws = new WebSocket(wsUrl);
 
-        ws.onmessage = (event) => {
+       ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            
-            // Logic for "Priority" messages. 
-            // Owncast doesn't have native "Super Chats", so we filter for specific criteria.
-            // Example: If message type is SYSTEM, or if a user types "!priority" 
-            if (data.type === 'SYSTEM' || (data.type === 'CHAT' && data.body.includes('!priority'))) {
-                showChatPopup(data.user?.displayName || 'System', data.body);
+            if (data.type === 'CHAT') {
+                showChatPopup(data.user?.displayName || 'Anonymous', data.body);
             }
         };
-
         ws.onclose = () => {
             console.log("Owncast WS closed, reconnecting in 5s...");
             setTimeout(connectOwncastChat, 5000);
